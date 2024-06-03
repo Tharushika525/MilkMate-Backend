@@ -12,6 +12,8 @@ app.use(
 
 app.use(express.json());
 
+app.get('/')
+
 module.exports = app;
 
 
