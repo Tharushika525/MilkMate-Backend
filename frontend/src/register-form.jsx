@@ -8,12 +8,16 @@ const RegistrationForm = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/register', data); // Ensure this URL matches your backend endpoint
+      const response = await axios.post('http://localhost:5000/api/register', data);
       console.log(response.data);
+  
+      // Redirect to the user page using the received user ID
+      window.location.href = `/user/${response.data.userId}`; // Modify URL structure as needed
     } catch (error) {
       console.error('There was an error submitting the form!', error);
     }
   };
+  
 
   return (
 

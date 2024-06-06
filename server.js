@@ -1,45 +1,28 @@
 const express = require('express');
-const cors = require('cors');
 const mongoose = require('mongoose');
+const User = require('./models/User'); // Corrected path to your User model
 
 const app = express();
 const port = 5000;
 
-app.use(cors());
+mongoose.connect('mongodb+srv://Tharushika:MilkMate2024@milk-mate-web.rd3iyax.mongodb.net/?retryWrites=true&w=majority&appName=Milk-Mate-Web', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
 app.use(express.json());
 
-const uri = 'mongodb://localhost:27017/users'; // Local MongoDB connection string to the 'users' database
-mongoose.connect(uri, { useNewUrlParser: true }); // Simply connecting with the URI
-
-const connection = mongoose.connection;
-connection.once('open', () => {
-  console.log('MongoDB database connection established successfully');
-});
-
-const userSchema = new mongoose.Schema({
-  email: String,
-  password: String,
-  gender: String,
-  city: String,
-  streetName: String,
-  remarks: String,
-  district: String,
-  terms: Boolean,
-});
-
-const User = mongoose.model('register', userSchema); // Use 'register' collection
-
-app.post('/api/register', async (req, res) => {
-  const newUser = new User(req.body);
-
+app.post('/api/register', async (req, res) => { // Ensure correct route definition with leading '/'
   try {
-    await newUser.save();
-    res.status(201).json(newUser);
-  } catch (err) {
-    res.status(400).json('Error: ' + err);
+    const { email, password, gender, city, streetName, remarks, district, terms } = req.body;
+    const newUser = await User.create({ email, password, gender, city, streetName, remarks, district, terms });
+    res.status(201).json({ success: true, userId: newUser._id });
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(500).json({ error: 'Error registering user' });
   }
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on port: ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
