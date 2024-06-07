@@ -1,6 +1,6 @@
 
   body {
-    background-image: url('./images/background_image.jpg'); /* Adjust the path to your background image */
+    background-image: url('./images/background.jpeg'); /* Adjust the path to your background image */
     background-size: cover;
     background-repeat: no-repeat;
     height: 100vh; /* Ensure the background covers the entire viewport height */

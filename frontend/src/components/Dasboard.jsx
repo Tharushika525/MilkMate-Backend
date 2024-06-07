@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import {
   Avatar,
@@ -9,51 +10,53 @@ import {
   Grid,
   Typography,
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import HistoryIcon from '@mui/icons-material/History';
-import StarIcon from '@mui/icons-material/Star';
 import EditIcon from '@mui/icons-material/Edit';
 
 const Dashboard = () => {
-  const [userData, setUserData] = useState(null);
+  const location = useLocation();
+  const user = location.state?.user;
+
+ 
+  const [userData, setUserData] = useState(user);
 
   useEffect(() => {
-    // Fetch user data from the backend when the component mounts
-    const fetchUserData = async () => {
-      try {
-        // Make a GET request to the backend API endpoint that serves user data
-        const response = await axios.get('http://localhost:5000/api/register'); // Adjust the endpoint URL
-        // Update the component state with the received user data
-        setUserData(response.data);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
+    if (!userData) {
+    
+      const fetchUserData = async () => {
+        try {
+          const response = await axios.get(`http://localhost:5000/api/user/${user._id}`); // Adjust the endpoint URL
+          setUserData(response.data);
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      };
 
-    fetchUserData(); // Call the fetchUserData function
-  }, []); // Empty dependency array ensures this effect runs only once on component mount
+      fetchUserData(); 
+    }
+  }, [userData, user]);
 
   const handleEditAccount = () => {
-    // Implement edit account functionality here
+   
     console.log('Edit account clicked');
   };
 
-  // Render loading state if user data is not yet fetched
+  
   if (!userData) {
     return <div>Loading...</div>;
   }
 
-  // Render dashboard UI with user data
+  
   return (
     <Box className="dashboard-container">
-      <Box className="user-info">
-        {/* Display user avatar */}
-        <Avatar alt={userData.name} src={userData.avatar} sx={{ width: 64, height: 64 }}>J</Avatar>
-        <Box className="user-details">
-          {/* Display user greeting */}
+      <Box className="user-info" display="flex" alignItems="center" mb={3}>
+      
+        <Avatar alt={userData.name} src={userData.avatar} sx={{ width: 64, height: 64 }}>
+          {userData.name[0]}
+        </Avatar>
+        <Box className="user-details" ml={2}>
+         
           <Typography variant="h5">{`Hello, ${userData.name}`}</Typography>
-          {/* Display user information */}
+          
           <Typography variant="body1">
             From your account dashboard, you can easily check & view your{' '}
             <Typography component="span" color="primary">Recent Orders</Typography>, manage your{' '}
@@ -65,13 +68,13 @@ const Dashboard = () => {
       </Box>
 
       <Grid container spacing={2}>
-        {/* Display user account information */}
+      
         <Grid item xs={12} md={6}>
           <Card className="info-card">
             <CardContent>
               <Typography variant="h6">ACCOUNT INFO</Typography>
               <Typography variant="body1">{userData.name}</Typography>
-              <Typography variant="body1">{userData.address}</Typography>
+              <Typography variant="body1">{userData.streetName}, {userData.city}, {userData.district}</Typography>
               <Typography variant="body1">Email: {userData.email}</Typography>
               <Typography variant="body1">Phone: {userData.phone}</Typography>
               <Button variant="outlined" className="button" onClick={handleEditAccount}>
@@ -82,7 +85,7 @@ const Dashboard = () => {
           </Card>
         </Grid>
 
-        {/* Other grid items */}
+       
 
       </Grid>
     </Box>
