@@ -15,11 +15,13 @@ body {
 }
 
 .content-container {
+  margin-top: 50px;
   flex-grow: 1;
   padding: 20px;
   display: flex;
   flex-direction: column;
-  align-items: center; 
+  align-items: center;
+  margin-left:50px; 
 }
 
 .main-content {
