@@ -1,89 +1,213 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
-import './register-form.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Button,
+  Checkbox,
+  Container,
+  CssBaseline,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { styled } from '@mui/system';
+import './register-form.css';
+
+const districts = [
+  'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle',
+  'Gampaha', 'Hambantota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle',
+  'Kilinochchi', 'Kurunegala', 'Mannar', 'Matale', 'Matara', 'Moneragala',
+  'Mullaitivu', 'Nuwara Eliya', 'Polonnaruwa', 'Puttalam', 'Ratnapura',
+  'Trincomalee', 'Vavuniya'
+];
+
+
 
 const RegistrationForm = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm();
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     try {
       const response = await axios.post('http://localhost:5000/api/user', data);
       console.log('Form submitted:', response.data);
-      navigate('/profile',{state:{user: response.data}});
+      navigate('/profile', { state: { user: response.data } });
     } catch (error) {
       console.error('Error submitting form:', error);
     }
   };
 
   return (
-    <div className="form-container">
-      <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="form-group">
-          <label>User Name</label>
-          <input type="text" {...register('name', { required: true })} placeholder="Enter your Name" />
-          {errors.email && <span>This field is required</span>}
-        </div>
-
-        <div className="form-group">
-          <label>Email</label>
-          <input type="email" {...register('email', { required: true })} placeholder="Enter your Email" />
-          {errors.email && <span>This field is required</span>}
-        </div>
-
-        <div className="form-group">
-          <label>Password</label>
-          <input type="password" {...register('password', { required: true, minLength: 4, maxLength: 12 })} placeholder="Enter password" />
-          {errors.password && <span>Your password must be between 4 and 12 characters</span>}
-        </div>
-
-        <div className="form-group">
-          <label>Gender</label>
-          <select {...register('gender', { required: true })}>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-          </select>
-          {errors.gender && <span>This field is required</span>}
-        </div>
-
-        <div className="form-group">
-          <label>City</label>
-          <input type="text" {...register('city', { required: true })} placeholder="Enter the nearest City" />
-          {errors.city && <span>This field is required</span>}
-        </div>
-
-        <div className="form-group">
-          <label>Street Name</label>
-          <input type="text" {...register('streetName', { required: true })} placeholder="Enter a Valid Address" />
-          {errors.streetName && <span>This field is required</span>}
-        </div>
-
-        <div className="form-group">
-          <label>Remarks (Optional)</label>
-          <input type="text" {...register('remarks')} placeholder="Enter optional Remarks" />
-        </div>
-
-        <div className="form-group">
-          <label>District</label>
-          <select {...register('district', { required: true })}>
-            <option value="Colombo">Colombo</option>
-            <option value="Galle">Galle</option>
-          </select>
-          {errors.district && <span>This field is required</span>}
-        </div>
-
-        <div className="form-group form-group-inline">
-          <input type="checkbox" {...register('terms', { required: true })} />
-          <label>I agree to terms and conditions</label>
-          {errors.terms && <span>You must agree to the terms</span>}
-        </div>
-
-        <button type="submit">Register</button>
-      </form>
-    </div>
+    <Container>
+    <Box
+    sx={{
+      marginTop: '50px',
+      maxWidth: '400px',
+      margin: 'auto',
+      padding: '20px',
+      backgroundColor: 'rgba(48, 90, 206, 0.8)',
+      borderRadius: '10px',
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    }}
+  >
+    <Typography variant="h5" component="h1" gutterBottom textAlign="center" color="white">
+      Register
+    </Typography>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <TextField
+        label="User Name"
+        {...register('name', { required: 'User Name is required' })}
+        fullWidth
+        margin="normal"
+        variant="outlined"
+        error={!!errors.name}
+        helperText={errors.name?.message}
+        InputLabelProps={{ style: { color: 'white' } }}
+        InputProps={{
+          style: { color: 'white' },
+        }}
+      />
+            <TextField
+              label="Email"
+              {...register('email', { required: 'Email is required' })}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              error={!!errors.email}
+              helperText={errors.email?.message}
+              InputLabelProps={{ style: { color: 'white' } }}
+              InputProps={{
+                style: { color: 'white' },
+              }}
+            />
+            <TextField
+              label="Password"
+              type="password"
+              {...register('password', {
+                required: 'Password is required',
+                minLength: { value: 4, message: 'Password must be at least 4 characters' },
+                maxLength: { value: 12, message: 'Password must be no more than 12 characters' },
+              })}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              error={!!errors.password}
+              helperText={errors.password?.message}
+              InputLabelProps={{ style: { color: 'white' } }}
+              InputProps={{
+                style: { color: 'white' },
+              }}
+            />
+            <FormControl fullWidth margin="normal" variant="outlined" error={!!errors.gender}>
+              <InputLabel style={{ color: 'white' }}>Gender</InputLabel>
+              <Select
+                label="Gender"
+                {...register('gender', { required: 'Gender is required' })}
+                defaultValue=""
+                style={{ color: 'white' }}
+              >
+                <MenuItem value="Male">Male</MenuItem>
+                <MenuItem value="Female">Female</MenuItem>
+              </Select>
+              <FormHelperText>{errors.gender?.message}</FormHelperText>
+            </FormControl>
+            <TextField
+              label="City"
+              {...register('city', { required: 'City is required' })}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              error={!!errors.city}
+              helperText={errors.city?.message}
+              InputLabelProps={{ style: { color: 'white' } }}
+              InputProps={{
+                style: { color: 'white' },
+              }}
+            />
+            <TextField
+              label="Street Name"
+              {...register('streetName', { required: 'Street Name is required' })}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              error={!!errors.streetName}
+              helperText={errors.streetName?.message}
+              InputLabelProps={{ style: { color: 'white' } }}
+              InputProps={{
+                style: { color: 'white' },
+              }}
+            />
+            <TextField
+              label="Remarks (Optional)"
+              {...register('remarks')}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              InputLabelProps={{ style: { color: 'white' } }}
+              InputProps={{
+                style: { color: 'white' },
+              }}
+            />
+            <FormControl fullWidth margin="normal" variant="outlined" error={!!errors.district}>
+              <InputLabel style={{ color: 'white' }}>District</InputLabel>
+              <Select
+                label="District"
+                {...register('district', { required: 'District is required' })}
+                defaultValue=""
+                style={{ color: 'white' }}
+              >
+                {districts.map((district) => (
+                  <MenuItem key={district} value={district}>{district}</MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>{errors.district?.message}</FormHelperText>
+            </FormControl>
+            <TextField
+              label="Mobile Number"
+              {...register('phone', {
+                required: 'Mobile Number is required',
+                pattern: {
+                  value: /^(\+94|0)?[1-9]\d{8}$/,
+                  message: 'Invalid Sri Lankan mobile number',
+                },
+              })}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              error={!!errors.phone}
+              helperText={errors.phone?.message}
+              InputLabelProps={{ style: { color: 'white' } }}
+              InputProps={{
+                style: { color: 'white' },
+              }}
+            />
+            <FormControlLabel
+              control={<Checkbox {...register('terms', { required: 'You must agree to the terms' })} />}
+              label="I agree to terms and conditions"
+              style={{ color: 'white' }}
+            />
+            <FormHelperText error={!!errors.terms}>{errors.terms?.message}</FormHelperText>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 3, mb: 2, bgcolor: '#6200ea', '&:hover': { bgcolor: '#3700b3' } }}
+            >
+              Register
+            </Button>
+            </form>
+      </Box>
+    </Container>
   );
 };
+
 
 export default RegistrationForm;
