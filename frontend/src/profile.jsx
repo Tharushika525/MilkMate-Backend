@@ -6,7 +6,8 @@ import Dashboard from './components/Dasboard';
 import OrderHistory from './components/OrderHistory';
 import RecommendedProducts from './components/RecommendedProducts';
 import Pagedrawer from './components/PageDrawer';
-import './profile.css'
+import './profile.css';
+
 
 export default function Profile() {
   return (

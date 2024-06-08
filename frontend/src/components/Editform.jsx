@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -11,52 +11,50 @@ import {
   Paper,
   CssBaseline,
 } from '@mui/material';
-
+const districts = [
+  'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle',
+  'Gampaha', 'Hambantota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle',
+  'Kilinochchi', 'Kurunegala', 'Mannar', 'Matale', 'Matara', 'Moneragala',
+  'Mullaitivu', 'Nuwara Eliya', 'Polonnaruwa', 'Puttalam', 'Ratnapura',
+  'Trincomalee', 'Vavuniya'
+];
 const EditForm = () => {
   const location = useLocation();
   const user = location.state?.user;
   const { register, handleSubmit, setValue } = useForm({
-    defaultValues: user
+    defaultValues: user || {}
   });
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
-    if (!user?.id) {
+    if (user && user._id) {
+      try {
+        const response = await axios.put(`http://localhost:5000/api/user/${user._id}`, data);
+        console.log('User updated:', response.data);
+        navigate('/profile', { state: { user: response.data } });;
+      } catch (error) {
+        console.error('Error updating user:', error);
+      }
+    } else {
       console.error('User ID is not defined');
-      return;
-    }
-    try {
-      const response = await axios.put(`http://localhost:5000/api/user/${user.id}`, data);
-      console.log('User updated:', response.data);
-      navigate('/dashboard', { state: { user: response.data } });
-    } catch (error) {
-      console.error('Error updating user:', error);
     }
   };
 
-  React.useEffect(() => {
+  // Pre-populate form fields
+  useEffect(() => {
     if (user) {
+      console.log('User data:', user); // Debugging log
       setValue('name', user.name);
       setValue('email', user.email);
       setValue('city', user.city);
       setValue('streetName', user.streetName);
       setValue('district', user.district);
       setValue('phone', user.phone);
+    } else {
+      console.error('User is not defined'); // Debugging log
     }
   }, [user, setValue]);
 
-  if (!user) {
-    return (
-      <Container component="main" maxWidth="sm">
-        <CssBaseline />
-        <Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
-          <Typography variant="h5" component="h1" gutterBottom>
-            No User Data
-          </Typography>
-        </Paper>
-      </Container>
-    );
-  }
   return (
     <Container component="main" maxWidth="sm">
       <CssBaseline />

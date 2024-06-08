@@ -3,15 +3,17 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Roboto', sans-serif;
-  background-color: #d8e4e7; 
-  color: #2c08f8; 
+  background-color: #05cdff; 
+  color: #030303; 
+  margin-top: 300px;
+  margin-left: 200px;
 }
 
 .profile-container {
   margin-left: 20%;
   display: flex;
   min-height: 100vh; 
-  background-color: #f8f9fc; 
+  background-color: #c2d6f3; 
 }
 
 .content-container {
@@ -28,6 +30,8 @@ body {
   width: 100%;
   max-width: 1200px;
   margin-bottom: 20px;
+ margin-top: 350px;
+
 }
 
 .drawer-container {

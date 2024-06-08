@@ -51,6 +51,30 @@ app.post('/api/user', async (req, res) => {
   }
 });
 
+app.get('/api/user/:id', async (req, res) => {
+  try {
+    const user = await Form.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/user/:id', async (req, res) => {
+  try {
+    const user = await Form.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

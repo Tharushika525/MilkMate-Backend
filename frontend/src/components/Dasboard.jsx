@@ -19,7 +19,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!userData) {
+    if (!userData && user) {
       const fetchUserData = async () => {
         try {
           const response = await axios.get(`http://localhost:5000/api/user/${user.id}`);
