@@ -21,6 +21,10 @@ const EditForm = () => {
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
+    if (!user?.id) {
+      console.error('User ID is not defined');
+      return;
+    }
     try {
       const response = await axios.put(`http://localhost:5000/api/user/${user.id}`, data);
       console.log('User updated:', response.data);
@@ -30,7 +34,6 @@ const EditForm = () => {
     }
   };
 
-  // Pre-populate form fields
   React.useEffect(() => {
     if (user) {
       setValue('name', user.name);
@@ -42,6 +45,18 @@ const EditForm = () => {
     }
   }, [user, setValue]);
 
+  if (!user) {
+    return (
+      <Container component="main" maxWidth="sm">
+        <CssBaseline />
+        <Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
+          <Typography variant="h5" component="h1" gutterBottom>
+            No User Data
+          </Typography>
+        </Paper>
+      </Container>
+    );
+  }
   return (
     <Container component="main" maxWidth="sm">
       <CssBaseline />

@@ -15,7 +15,7 @@ export default function Profile() {
     <Sidebar />
     <div className="content-container">
       <div className="main-content">
-        <Dashboard />
+       <Dashboard/>
         <OrderHistory />
         <RecommendedProducts />
       </div>
