@@ -46,14 +46,14 @@ router.get('/products', async (req, res) => {
     }
   });
 
-  router.get('/products', async (req, res) => {
-    try {
-      const products = await Product.find();
-      res.json(products);
-    } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
-  });
+  // router.get('/products', async (req, res) => {
+  //   try {
+  //     const products = await Product.find();
+  //     res.json(products);
+  //   } catch (err) {
+  //     res.status(400).json({ message: err.message });
+  //   }
+  // });
   
 
  
