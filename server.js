@@ -13,9 +13,12 @@ app.use(cors());
 // MongoDB connection
 mongoose.connect('mongodb+srv://Tharushika:MilkMate2024@milk-mate-web.rd3iyax.mongodb.net/user?retryWrites=true&w=majority', {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+}).then(() => {
+  console.log('Connected to MongoDB');
+}).catch((error) => {
+  console.error('connection error:', error);
 });
-
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
