@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Button, Grid, Paper, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 
 const ManagementInterface = () => {
     const [users, setUsers] = useState([]);
@@ -9,17 +9,15 @@ const ManagementInterface = () => {
     const [editSeller, setEditSeller] = useState(null);
     const [openUserDialog, setOpenUserDialog] = useState(false);
     const [openSellerDialog, setOpenSellerDialog] = useState(false);
-    const [userData, setUserData] = useState({ name: '', email: '' });
+    const [userData, setUserData] = useState({ name: '', email: '', phone: '', password: '', city: '' });
     const [sellerData, setSellerData] = useState({ name: '', email: '' });
 
     useEffect(() => {
-        // Fetch users from the backend when component mounts
         const fetchUsers = async () => {
             const response = await axios.get('http://localhost:5000/api/users');
             setUsers(response.data);
         };
 
-        // Fetch sellers from the backend when component mounts
         const fetchSellers = async () => {
             const response = await axios.get('http://localhost:5000/api/sellers');
             setSellers(response.data);
@@ -37,7 +35,7 @@ const ManagementInterface = () => {
     const handleEditUser = (user) => {
         setEditUser(user);
         setOpenUserDialog(true);
-        setUserData({ name: user.name, email: user.email });
+        setUserData({ name: user.name, email: user.email, phone: user.phone, password: user.password, city: user.city });
     };
 
     const handleUpdateUser = async () => {
@@ -64,66 +62,77 @@ const ManagementInterface = () => {
     };
 
     return (
-        <div className='container'style={{backgroundColor: "lightblue",marginLeft:"50px",paddingLeft:"15px",paddingRight:"15px",paddingTop:"10px",paddingBottom:"15px"}}>
+        <div className='container' style={{ backgroundColor: "lightblue", marginLeft: "50px",marginTop:"50px", paddingLeft: "15px", paddingRight: "15px", paddingTop: "10px", paddingBottom: "15px" }}>
             <h2>User Management</h2>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Email</TableCell>
-                            <TableCell>Action</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {users.map(user => (
-                            <TableRow key={user._id}>
-                                <TableCell>{user.name}</TableCell>
-                                <TableCell>{user.email}</TableCell>
-                                <TableCell>
-                                    <Button onClick={() => handleDeleteUser(user._id)} variant="contained" color="secondary">Delete</Button>
-                                    <Button onClick={() => handleEditUser(user)} variant="contained" color="primary">Edit</Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <Grid container spacing={2}>
+                <Grid item xs={12}>
+                    <Paper>
+                        <TableContainer>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>Email</TableCell>
+                                        <TableCell>Action</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {users.map(user => (
+                                        <TableRow key={user._id}>
+                                            <TableCell>{user.name}</TableCell>
+                                            <TableCell>{user.email}</TableCell>
+                                            <TableCell>
+                                                <Button onClick={() => handleDeleteUser(user._id)} variant="contained" color="secondary">Delete</Button>
+                                                <Button onClick={() => handleEditUser(user)} variant="contained" color="primary">Edit</Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Paper>
+                </Grid>
+            </Grid>
 
             <h2>Seller Management</h2>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Email</TableCell>
-                            <TableCell>Action</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {sellers.map(seller => (
-                            <TableRow key={seller._id}>
-                                <TableCell>{seller.name}</TableCell>
-                                <TableCell>{seller.email}</TableCell>
-                                <TableCell>
-                                    <Button onClick={() => handleDeleteSeller(seller._id)} variant="contained" color="secondary">Delete</Button>
-                                    <Button onClick={() => handleEditSeller(seller)} variant="contained" color="primary">Edit</Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <Grid container spacing={2}>
+                <Grid item xs={12}>
+                    <Paper>
+                        <TableContainer>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>Email</TableCell>
+                                        <TableCell>Action</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {sellers.map(seller => (
+                                        <TableRow key={seller._id}>
+                                            <TableCell>{seller.name}</TableCell>
+                                            <TableCell>{seller.email}</TableCell>
+                                            <TableCell>
+                                                <Button onClick={() => handleDeleteSeller(seller._id)} variant="contained" color="secondary">Delete</Button>
+                                                <Button onClick={() => handleEditSeller(seller)} variant="contained" color="primary">Edit</Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Paper>
+                </Grid>
+            </Grid>
 
-            {/* Edit User Dialog */}
             <Dialog open={openUserDialog} onClose={() => setOpenUserDialog(false)}>
                 <DialogTitle>Edit User</DialogTitle>
                 <DialogContent>
                     <TextField label="Name" value={userData.name} onChange={(e) => setUserData({ ...userData, name: e.target.value })} />
                     <TextField label="Email" value={userData.email} onChange={(e) => setUserData({ ...userData, email: e.target.value })} />
-                    <TextField label="phone" value={userData.phone} onChange={(e) => setUserData({ ...userData, phone: e.target.value })} />
-                    <TextField label="password" value={userData.password} onChange={(e) => setUserData({ ...userData, password: e.target.value })} />
-                    <TextField label="city" value={userData.city} onChange={(e) => setUserData({ ...userData, city: e.target.value })} />
+                    <TextField label="Phone" value={userData.phone} onChange={(e) => setUserData({ ...userData, phone: e.target.value })} />
+                    <TextField label="Password" value={userData.password} onChange={(e) => setUserData({ ...userData, password: e.target.value })} />
+                    <TextField label="City" value={userData.city} onChange={(e) => setUserData({ ...userData, city: e.target.value })} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleUpdateUser} variant="contained" color="primary">Update</Button>
@@ -131,7 +140,6 @@ const ManagementInterface = () => {
                 </DialogActions>
             </Dialog>
 
-            {/* Edit Seller Dialog */}
             <Dialog open={openSellerDialog} onClose={() => setOpenSellerDialog(false)}>
                 <DialogTitle>Edit Seller</DialogTitle>
                 <DialogContent>

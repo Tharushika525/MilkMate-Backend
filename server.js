@@ -3,11 +3,9 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
 const app = express();
 const port = 5000;
-const JWT_SECRET = 'your_jwt_secret'; // Replace with your own secret key
 
 // Middleware
 app.use(bodyParser.json());
@@ -50,7 +48,6 @@ const userSchema = new mongoose.Schema({
   businessName: String,
   city: String,
   religion: String,
-  role: { type: String, default: 'user' } // Added role field
 });
 
 const User = mongoose.model('User', userSchema);
@@ -70,37 +67,15 @@ const sellerSchema = new mongoose.Schema({
   mobilePhone: String,
   emailAddress: String,
   terms: Boolean,
-});
+},{collection: 'sellerdetails'});
 
 const Seller = sellerConnection.model('Seller', sellerSchema);
 
-// Middleware for authentication
-const authenticateJWT = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Access denied, no token provided.' });
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    res.status(400).json({ message: 'Invalid token.' });
-  }
-};
-
-// Middleware for admin authorization
-const isAdmin = (req, res, next) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Access denied, not an admin.' });
-  }
-  next();
-};
-
-// User Registration
+// User Routes
 app.post('/api/user', async (req, res) => {
-  const { name, email, phone, password, businessName, city, religion, role } = req.body;
+  const { name, email, phone, password, businessName, city, religion } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = new User({ name, email, phone, password: hashedPassword, businessName, city, religion, role });
+  const newUser = new User({ name, email, phone, password: hashedPassword, businessName, city, religion });
 
   try {
     await newUser.save();
@@ -110,26 +85,7 @@ app.post('/api/user', async (req, res) => {
   }
 });
 
-// User Login
-app.post('/api/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
-
-    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// User Routes (Protected)
-app.get('/api/user/:id', authenticateJWT, async (req, res) => {
+app.get('/api/user/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -141,7 +97,7 @@ app.get('/api/user/:id', authenticateJWT, async (req, res) => {
   }
 });
 
-app.put('/api/user/:id', authenticateJWT, async (req, res) => {
+app.put('/api/user/:id', async (req, res) => {
   try {
     const { password, ...updateData } = req.body;
     if (password) {
@@ -157,7 +113,7 @@ app.put('/api/user/:id', authenticateJWT, async (req, res) => {
   }
 });
 
-app.delete('/api/user/:id', authenticateJWT, async (req, res) => {
+app.delete('/api/user/:id', async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
@@ -169,20 +125,11 @@ app.delete('/api/user/:id', authenticateJWT, async (req, res) => {
   }
 });
 
-// Admin Routes (Protected and Admin Only)
-app.get('/api/users', authenticateJWT, isAdmin, async (req, res) => {
+// Add the missing route for fetching all users
+app.get('/api/users', async (req, res) => {
   try {
     const users = await User.find();
     res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get('/api/sellers', authenticateJWT, isAdmin, async (req, res) => {
-  try {
-    const sellers = await Seller.find();
-    res.json(sellers);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -230,7 +177,7 @@ app.post('/api/seller', async (req, res) => {
   }
 });
 
-app.get('/api/seller/:id', authenticateJWT, async (req, res) => {
+app.get('/api/seller/:id', async (req, res) => {
   try {
     const seller = await Seller.findById(req.params.id);
     if (!seller) {
@@ -242,7 +189,7 @@ app.get('/api/seller/:id', authenticateJWT, async (req, res) => {
   }
 });
 
-app.put('/api/seller/:id', authenticateJWT, async (req, res) => {
+app.put('/api/seller/:id', async (req, res) => {
   try {
     const seller = await Seller.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!seller) {
@@ -254,13 +201,23 @@ app.put('/api/seller/:id', authenticateJWT, async (req, res) => {
   }
 });
 
-app.delete('/api/seller/:id', authenticateJWT, async (req, res) => {
+app.delete('/api/seller/:id', async (req, res) => {
   try {
     const seller = await Seller.findByIdAndDelete(req.params.id);
     if (!seller) {
       return res.status(404).json({ message: 'Seller not found' });
     }
     res.json({ message: 'Seller deleted' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Add the missing route for fetching all sellers
+app.get('/api/sellers', async (req, res) => {
+  try {
+    const sellers = await Seller.find();
+    res.json(sellers);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
