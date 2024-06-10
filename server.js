@@ -2,60 +2,105 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const port = 5000;
+const JWT_SECRET = 'your_jwt_secret'; // Replace with your own secret key
 
 // Middleware
 app.use(bodyParser.json());
 app.use(cors());
 
-// MongoDB connection
+// MongoDB connection for user database
 mongoose.connect('mongodb+srv://Tharushika:MilkMate2024@milk-mate-web.rd3iyax.mongodb.net/user?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-}).then(() => {
-  console.log('Connected to MongoDB');
-}).catch((error) => {
-  console.error('connection error:', error);
-});
+})
+  .then(() => {
+    console.log('Connected to MongoDB (user database)');
+  })
+  .catch((error) => {
+    console.error('Connection error for users:', error);
+  });
 
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
+db.on('error', console.error.bind(console, 'connection error for users:'));
 db.once('open', () => {
-  console.log('Connected to MongoDB');
+  console.log('Connected to MongoDB (user database)');
 });
 
-// Schema and Model for Users
+// MongoDB connection for seller database
+const sellerConnection = mongoose.createConnection('mongodb+srv://Tharushika:MilkMate2024@milk-mate-web.rd3iyax.mongodb.net/test?retryWrites=true&w=majority', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+sellerConnection.on('error', console.error.bind(console, 'connection error for sellers:'));
+sellerConnection.once('open', () => {
+  console.log('Connected to MongoDB (seller database)');
+});
+
+// User Schema and Model
 const userSchema = new mongoose.Schema({
   name: String,
   email: String,
-  password: String, 
-  gender:String, 
-  city:String, 
-  streetName: String,
-  remarks: String, 
-  district: String, 
-  terms: String,
+  phone: String,
+  password: String,
+  businessName: String,
+  city: String,
+  religion: String,
+  role: { type: String, default: 'user' } // Added role field
 });
 
 const User = mongoose.model('User', userSchema);
 
-// Schema and Model for Seller Details
+// Seller Schema and Model
 const sellerSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  shopName: String,
-  contact: String,
-  address: String,
+  businessName: String,
+  address1: String,
+  address2: String,
+  city: String,
+  region: String,
+  postalCode: String,
+  country: String,
+  firstName: String,
+  lastName: String,
+  phoneNumber: String,
+  mobilePhone: String,
+  emailAddress: String,
+  terms: Boolean,
 });
 
-const Seller = mongoose.model('Seller', sellerSchema);
+const Seller = sellerConnection.model('Seller', sellerSchema);
 
-// User Routes
+// Middleware for authentication
+const authenticateJWT = (req, res, next) => {
+  const token = req.header('Authorization')?.split(' ')[1];
+  if (!token) return res.status(401).json({ message: 'Access denied, no token provided.' });
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res.status(400).json({ message: 'Invalid token.' });
+  }
+};
+
+// Middleware for admin authorization
+const isAdmin = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Access denied, not an admin.' });
+  }
+  next();
+};
+
+// User Registration
 app.post('/api/user', async (req, res) => {
-  const { name, email, password, gender, city, streetName, remarks, district, terms} = req.body;
-  const newUser = new User({ name, email, password, gender, city, streetName, remarks, district, terms });
+  const { name, email, phone, password, businessName, city, religion, role } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = new User({ name, email, phone, password: hashedPassword, businessName, city, religion, role });
 
   try {
     await newUser.save();
@@ -65,7 +110,26 @@ app.post('/api/user', async (req, res) => {
   }
 });
 
-app.get('/api/user/:id', async (req, res) => {
+// User Login
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+
+    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// User Routes (Protected)
+app.get('/api/user/:id', authenticateJWT, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -77,9 +141,13 @@ app.get('/api/user/:id', async (req, res) => {
   }
 });
 
-app.put('/api/user/:id', async (req, res) => {
+app.put('/api/user/:id', authenticateJWT, async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { password, ...updateData } = req.body;
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+    const user = await User.findByIdAndUpdate(req.params.id, updateData, { new: true });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -89,7 +157,7 @@ app.put('/api/user/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/user/:id', async (req, res) => {
+app.delete('/api/user/:id', authenticateJWT, async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
@@ -101,10 +169,58 @@ app.delete('/api/user/:id', async (req, res) => {
   }
 });
 
+// Admin Routes (Protected and Admin Only)
+app.get('/api/users', authenticateJWT, isAdmin, async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/sellers', authenticateJWT, isAdmin, async (req, res) => {
+  try {
+    const sellers = await Seller.find();
+    res.json(sellers);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Seller Routes
 app.post('/api/seller', async (req, res) => {
-  const { name, email, shopName, contact, address }
-  const newSeller = new Seller({ name, email, shopName, contact, address });
+  const {
+    businessName,
+    address1,
+    address2,
+    city,
+    region,
+    postalCode,
+    country,
+    firstName,
+    lastName,
+    phoneNumber,
+    mobilePhone,
+    emailAddress,
+    terms
+  } = req.body;
+
+  const newSeller = new Seller({
+    businessName,
+    address1,
+    address2,
+    city,
+    region,
+    postalCode,
+    country,
+    firstName,
+    lastName,
+    phoneNumber,
+    mobilePhone,
+    emailAddress,
+    terms
+  });
 
   try {
     await newSeller.save();
@@ -114,7 +230,7 @@ app.post('/api/seller', async (req, res) => {
   }
 });
 
-app.get('/api/seller/:id', async (req, res) => {
+app.get('/api/seller/:id', authenticateJWT, async (req, res) => {
   try {
     const seller = await Seller.findById(req.params.id);
     if (!seller) {
@@ -126,7 +242,7 @@ app.get('/api/seller/:id', async (req, res) => {
   }
 });
 
-app.put('/api/seller/:id', async (req, res) => {
+app.put('/api/seller/:id', authenticateJWT, async (req, res) => {
   try {
     const seller = await Seller.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!seller) {
@@ -138,7 +254,7 @@ app.put('/api/seller/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/seller/:id', async (req, res) => {
+app.delete('/api/seller/:id', authenticateJWT, async (req, res) => {
   try {
     const seller = await Seller.findByIdAndDelete(req.params.id);
     if (!seller) {
@@ -150,6 +266,7 @@ app.delete('/api/seller/:id', async (req, res) => {
   }
 });
 
+// Listen on port
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

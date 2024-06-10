@@ -1,126 +1,150 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { 
-  Button, 
-  TextField, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  Paper 
-} from '@mui/material';
+import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
-const UserManagement = () => {
-  const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    gender: '',
-    city: '',
-    streetName: '',
-    remarks: '',
-    district: '',
-    terms: '',
-  });
+const ManagementInterface = () => {
+    const [users, setUsers] = useState([]);
+    const [sellers, setSellers] = useState([]);
+    const [editUser, setEditUser] = useState(null);
+    const [editSeller, setEditSeller] = useState(null);
+    const [openUserDialog, setOpenUserDialog] = useState(false);
+    const [openSellerDialog, setOpenSellerDialog] = useState(false);
+    const [userData, setUserData] = useState({ name: '', email: '' });
+    const [sellerData, setSellerData] = useState({ name: '', email: '' });
 
-  useEffect(() => {
-    axios.get('/api/user')
-      .then(response => setUsers(response.data))
-      .catch(error => console.error(error));
-  }, []);
+    useEffect(() => {
+        // Fetch users from the backend when component mounts
+        const fetchUsers = async () => {
+            const response = await axios.get('http://localhost:5000/api/users');
+            setUsers(response.data);
+        };
 
-  const handleEdit = (user) => {
-    setSelectedUser(user);
-    setFormData(user);
-  };
+        // Fetch sellers from the backend when component mounts
+        const fetchSellers = async () => {
+            const response = await axios.get('http://localhost:5000/api/sellers');
+            setSellers(response.data);
+        };
 
-  const handleDelete = (id) => {
-    axios.delete(`/api/user/${id}`)
-      .then(() => setUsers(users.filter(user => user._id !== id)))
-      .catch(error => console.error(error));
-  };
+        fetchUsers();
+        fetchSellers();
+    }, []);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+    const handleDeleteUser = async (userId) => {
+        await axios.delete(`http://localhost:5000/api/user/${userId}`);
+        setUsers(users.filter(user => user._id !== userId));
+    };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (selectedUser) {
-      axios.put(`/api/user/${selectedUser._id}`, formData)
-        .then(response => {
-          setUsers(users.map(user => user._id === selectedUser._id ? response.data : user));
-          setSelectedUser(null);
-          setFormData({
-            name: '',
-            email: '',
-            password: '',
-            gender: '',
-            city: '',
-            streetName: '',
-            remarks: '',
-            district: '',
-            terms: '',
-          });
-        })
-        .catch(error => console.error(error));
-    } else {
-      axios.post('/api/user', formData)
-        .then(response => setUsers([...users, response.data]))
-        .catch(error => console.error(error));
-    }
-  };
+    const handleEditUser = (user) => {
+        setEditUser(user);
+        setOpenUserDialog(true);
+        setUserData({ name: user.name, email: user.email });
+    };
 
-  return (
-    <div>
-      <h2>User Management</h2>
-      <form onSubmit={handleSubmit}>
-        <TextField name="name" label="Name" value={formData.name} onChange={handleChange} required />
-        <TextField name="email" label="Email" value={formData.email} onChange={handleChange} required />
-        <TextField name="password" label="Password" value={formData.password} onChange={handleChange} required />
-        <TextField name="gender" label="Gender" value={formData.gender} onChange={handleChange} required />
-        <TextField name="city" label="City" value={formData.city} onChange={handleChange} required />
-        <TextField name="streetName" label="Street Name" value={formData.streetName} onChange={handleChange} required />
-        <TextField name="remarks" label="Remarks" value={formData.remarks} onChange={handleChange} />
-        <TextField name="district" label="District" value={formData.district} onChange={handleChange} required />
-        <TextField name="terms" label="Terms" value={formData.terms} onChange={handleChange} required />
-        <Button type="submit" variant="contained" color="primary">
-          {selectedUser ? 'Update User' : 'Add User'}
-        </Button>
-      </form>
+    const handleUpdateUser = async () => {
+        await axios.put(`http://localhost:5000/api/user/${editUser._id}`, userData);
+        setEditUser(null);
+        setOpenUserDialog(false);
+    };
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users.map(user => (
-              <TableRow key={user._id}>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <Button onClick={() => handleEdit(user)}>Edit</Button>
-                  <Button onClick={() => handleDelete(user._id)}>Delete</Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
-  );
+    const handleDeleteSeller = async (sellerId) => {
+        await axios.delete(`http://localhost:5000/api/seller/${sellerId}`);
+        setSellers(sellers.filter(seller => seller._id !== sellerId));
+    };
+
+    const handleEditSeller = (seller) => {
+        setEditSeller(seller);
+        setOpenSellerDialog(true);
+        setSellerData({ name: seller.name, email: seller.email });
+    };
+
+    const handleUpdateSeller = async () => {
+        await axios.put(`http://localhost:5000/api/seller/${editSeller._id}`, sellerData);
+        setEditSeller(null);
+        setOpenSellerDialog(false);
+    };
+
+    return (
+        <div className='container'style={{backgroundColor: "lightblue",marginLeft:"50px",paddingLeft:"15px",paddingRight:"15px",paddingTop:"10px",paddingBottom:"15px"}}>
+            <h2>User Management</h2>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Email</TableCell>
+                            <TableCell>Action</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {users.map(user => (
+                            <TableRow key={user._id}>
+                                <TableCell>{user.name}</TableCell>
+                                <TableCell>{user.email}</TableCell>
+                                <TableCell>
+                                    <Button onClick={() => handleDeleteUser(user._id)} variant="contained" color="secondary">Delete</Button>
+                                    <Button onClick={() => handleEditUser(user)} variant="contained" color="primary">Edit</Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            <h2>Seller Management</h2>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Email</TableCell>
+                            <TableCell>Action</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {sellers.map(seller => (
+                            <TableRow key={seller._id}>
+                                <TableCell>{seller.name}</TableCell>
+                                <TableCell>{seller.email}</TableCell>
+                                <TableCell>
+                                    <Button onClick={() => handleDeleteSeller(seller._id)} variant="contained" color="secondary">Delete</Button>
+                                    <Button onClick={() => handleEditSeller(seller)} variant="contained" color="primary">Edit</Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            {/* Edit User Dialog */}
+            <Dialog open={openUserDialog} onClose={() => setOpenUserDialog(false)}>
+                <DialogTitle>Edit User</DialogTitle>
+                <DialogContent>
+                    <TextField label="Name" value={userData.name} onChange={(e) => setUserData({ ...userData, name: e.target.value })} />
+                    <TextField label="Email" value={userData.email} onChange={(e) => setUserData({ ...userData, email: e.target.value })} />
+                    <TextField label="phone" value={userData.phone} onChange={(e) => setUserData({ ...userData, phone: e.target.value })} />
+                    <TextField label="password" value={userData.password} onChange={(e) => setUserData({ ...userData, password: e.target.value })} />
+                    <TextField label="city" value={userData.city} onChange={(e) => setUserData({ ...userData, city: e.target.value })} />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleUpdateUser} variant="contained" color="primary">Update</Button>
+                    <Button onClick={() => setOpenUserDialog(false)} variant="contained" color="secondary">Cancel</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Edit Seller Dialog */}
+            <Dialog open={openSellerDialog} onClose={() => setOpenSellerDialog(false)}>
+                <DialogTitle>Edit Seller</DialogTitle>
+                <DialogContent>
+                    <TextField label="Name" value={sellerData.name} onChange={(e) => setSellerData({ ...sellerData, name: e.target.value })} />
+                    <TextField label="Email" value={sellerData.email} onChange={(e) => setSellerData({ ...sellerData, email: e.target.value })} />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleUpdateSeller} variant="contained" color="primary">Update</Button>
+                    <Button onClick={() => setOpenSellerDialog(false)} variant="contained" color="secondary">Cancel</Button>
+                </DialogActions>
+            </Dialog>
+        </div>
+    );
 };
 
-export default UserManagement;
+export default ManagementInterface;
