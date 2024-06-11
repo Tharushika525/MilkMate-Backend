@@ -47,6 +47,8 @@ const userSchema = new mongoose.Schema({
   password: String,
   businessName: String,
   city: String,
+  streetName: String,
+  district: String,
   religion: String,
 });
 
@@ -147,6 +149,10 @@ app.post('/api/check-email', async (req, res) => {
 // Login Endpoint
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
+
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -165,7 +171,6 @@ app.post('/api/login', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 
 // Seller Routes

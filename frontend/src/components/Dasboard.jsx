@@ -69,7 +69,7 @@ const Dashboard = () => {
             <CardContent>
               <Typography variant="h6" sx={{ mb: 1 }}>ACCOUNT INFO</Typography>
               <Typography variant="body1">{userData.name}</Typography>
-              <Typography variant="body1">{`${userData.streetName}, ${userData.city}, ${userData.district}`}</Typography>
+              <Typography variant="body1">{`${userData.streetName || 'N/A'}, ${userData.city || 'N/A'}, ${userData.district || 'N/A'}`}</Typography>
               <Typography variant="body1">{`Email: ${userData.email}`}</Typography>
               <Typography variant="body1">{`Phone: ${userData.phone}`}</Typography>
               <Button

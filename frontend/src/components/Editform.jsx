@@ -11,6 +11,7 @@ import {
   Paper,
   CssBaseline,
 } from '@mui/material';
+
 const districts = [
   'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle',
   'Gampaha', 'Hambantota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle',
@@ -18,6 +19,7 @@ const districts = [
   'Mullaitivu', 'Nuwara Eliya', 'Polonnaruwa', 'Puttalam', 'Ratnapura',
   'Trincomalee', 'Vavuniya'
 ];
+
 const EditForm = () => {
   const location = useLocation();
   const user = location.state?.user;
@@ -31,7 +33,7 @@ const EditForm = () => {
       try {
         const response = await axios.put(`http://localhost:5000/api/user/${user._id}`, data);
         console.log('User updated:', response.data);
-        navigate('/profile', { state: { user: response.data } });;
+        navigate('/profile', { state: { user: response.data } });
       } catch (error) {
         console.error('Error updating user:', error);
       }
@@ -46,7 +48,6 @@ const EditForm = () => {
       console.log('User data:', user); // Debugging log
       setValue('name', user.name);
       setValue('email', user.email);
-      setValue('email', user.password);
       setValue('city', user.city);
       setValue('streetName', user.streetName);
       setValue('district', user.district);
@@ -67,13 +68,6 @@ const EditForm = () => {
           <TextField
             label="Name"
             {...register('name', { required: true })}
-            fullWidth
-            margin="normal"
-            variant="outlined"
-          />
-           <TextField
-            label="Password"
-            {...register('password', { required: true })}
             fullWidth
             margin="normal"
             variant="outlined"

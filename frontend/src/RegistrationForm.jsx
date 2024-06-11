@@ -119,32 +119,36 @@ const RegistrationForm = () => {
             </Select>
             <FormHelperText>{errors.gender?.message}</FormHelperText>
           </FormControl>
-          <TextField
-            label="City"
-            {...register('city', { required: 'City is required' })}
-            fullWidth
-            margin="normal"
-            variant="outlined"
-            error={!!errors.city}
-            helperText={errors.city?.message}
-            InputLabelProps={{ style: { color: 'white' } }}
-            InputProps={{
-              style: { color: 'white' },
-            }}
-          />
-          <TextField
-            label="Street Name"
-            {...register('streetName', { required: 'Street Name is required' })}
-            fullWidth
-            margin="normal"
-            variant="outlined"
-            error={!!errors.streetName}
-            helperText={errors.streetName?.message}
-            InputLabelProps={{ style: { color: 'white' } }}
-            InputProps={{
-              style: { color: 'white' },
-            }}
-          />
+          // RegistrationForm component
+
+<TextField
+  label="City"
+  {...register('city', { required: 'City is required' })}
+  fullWidth
+  margin="normal"
+  variant="outlined"
+  error={!!errors.city}
+  helperText={errors.city?.message}
+  InputLabelProps={{ style: { color: 'white' } }}
+  InputProps={{
+    style: { color: 'white' },
+  }}
+/>
+
+<TextField
+  label="Street Name"
+  {...register('streetName', { required: 'Street Name is required' })}
+  fullWidth
+  margin="normal"
+  variant="outlined"
+  error={!!errors.streetName}
+  helperText={errors.streetName?.message}
+  InputLabelProps={{ style: { color: 'white' } }}
+  InputProps={{
+    style: { color: 'white' },
+  }}
+/>
+
           <TextField
             label="Remarks (Optional)"
             {...register('remarks')}
