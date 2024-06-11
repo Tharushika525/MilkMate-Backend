@@ -6,17 +6,15 @@ const AdminLogin = ({ onLogin }) => {
     const [password, setPassword] = useState('');
 
     const handleLogin = () => {
-        // Basic validation, you can add more validation as per your requirements
         if (username.trim() === '' || password.trim() === '') {
             alert('Please enter both username and password');
             return;
         }
-        // You can add more advanced authentication logic here
         onLogin(username, password);
     };
 
     return (
-        <Grid container justifyContent="center" alignItems="center" style={{ height: '100vh' }}>
+        <Grid container justifyContent="center" alignItems="center" style={{ height: '100vh', width: '1200px' }}>
             <Grid item xs={10} sm={6} md={4}>
                 <Paper elevation={3} style={{ padding: 20 }}>
                     <h2 style={{ textAlign: 'center' }}>Admin Login</h2>

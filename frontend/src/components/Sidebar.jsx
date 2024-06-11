@@ -17,7 +17,7 @@ const sidebarItems = [
   { text: 'Track Order', icon: <LocalShippingIcon />, path: '/track-order' },
   { text: 'Shopping Cart', icon: <ShoppingCartIcon />, path: '/shopping-cart' },
   { text: 'Cards & Address', icon: <CreditCardIcon />, path: '/cards-address' },
-   { text: 'Log-out', icon: <ExitToAppIcon />, path: '/logout' }
+   { text: 'Log-out', icon: <ExitToAppIcon />, path: '/login' }
 ];
 
 const Drawer = styled(MuiDrawer)(({ theme }) => ({

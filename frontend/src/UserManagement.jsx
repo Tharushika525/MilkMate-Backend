@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button, Grid, Paper, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-
+import { useNavigate } from 'react-router-dom';
 const ManagementInterface = () => {
     const [users, setUsers] = useState([]);
     const [sellers, setSellers] = useState([]);
@@ -12,6 +12,7 @@ const ManagementInterface = () => {
     const [userData, setUserData] = useState({ name: '', email: '', phone: '', password: '', city: '' });
     const [sellerData, setSellerData] = useState({ name: '', email: '' });
 
+    const navigate = useNavigate(); 
     useEffect(() => {
         const fetchUsers = async () => {
             const response = await axios.get('http://localhost:5000/api/users');
@@ -26,6 +27,10 @@ const ManagementInterface = () => {
         fetchUsers();
         fetchSellers();
     }, []);
+    const handleLogout = () => {
+        // Clear any authentication tokens or state here
+        navigate('/admin-login'); // Navigate to AdminLogin page
+    };
 
     const handleDeleteUser = async (userId) => {
         await axios.delete(`http://localhost:5000/api/user/${userId}`);
@@ -59,10 +64,16 @@ const ManagementInterface = () => {
         await axios.put(`http://localhost:5000/api/seller/${editSeller._id}`, sellerData);
         setEditSeller(null);
         setOpenSellerDialog(false);
+
+        const updatedSellers = sellers.map((s) => (s._id === editSeller._id ? { ...s, ...sellerData } : s));
+        setSellers(updatedSellers);
     };
 
     return (
         <div className='container' style={{ backgroundColor: "lightblue", marginLeft: "50px",marginTop:"50px", paddingLeft: "15px", paddingRight: "15px", paddingTop: "10px", paddingBottom: "15px" }}>
+             <Button onClick={handleLogout} variant="contained" color="secondary" style={{ marginBottom: "20px" }}>
+                Logout
+            </Button>
             <h2>User Management</h2>
             <Grid container spacing={2}>
                 <Grid item xs={12}>

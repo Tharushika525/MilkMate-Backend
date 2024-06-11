@@ -46,6 +46,7 @@ const EditForm = () => {
       console.log('User data:', user); // Debugging log
       setValue('name', user.name);
       setValue('email', user.email);
+      setValue('email', user.password);
       setValue('city', user.city);
       setValue('streetName', user.streetName);
       setValue('district', user.district);
@@ -66,6 +67,13 @@ const EditForm = () => {
           <TextField
             label="Name"
             {...register('name', { required: true })}
+            fullWidth
+            margin="normal"
+            variant="outlined"
+          />
+           <TextField
+            label="Password"
+            {...register('password', { required: true })}
             fullWidth
             margin="normal"
             variant="outlined"
