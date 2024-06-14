@@ -54,7 +54,7 @@ router.post('/approve-product/:id', async (req, res) => {
     const product = await Product.findByIdAndUpdate(productId, { approvalStatus: 'approved' }, { new: true });
     res.json(product);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(200).json({ message: err.message });
   }
 });
 

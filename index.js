@@ -83,9 +83,10 @@ db.once('open', () => {
   console.log('Connected to MongoDB');
 });
 
+
 // Routes
 const sellerRoutes = require('./routes/seller');
-const adminRoutes = require('./routes/admin');
+const adminRoutes = require('./Routes/admin');
 app.use('/seller', sellerRoutes);
 app.use('/admin', adminRoutes);
 app.use("/api", authRoutes);
