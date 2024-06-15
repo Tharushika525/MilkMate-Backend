@@ -1,19 +1,36 @@
-// console.log("Node is Running...")
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const orderRoutes = require('./routes/orderRoutes'); // Import order routes
 
-const { default: mongoose } = require('mongoose');
-const app = require('./app');
-const port = 3001;
-const host = '127.0.0.1';
+require('dotenv').config();
 
-const server = app.listen(port,host, () =>{
-    console.log(`Node server is listening to ${server.address().port}`)
+const app = express();
+
+// Middleware
+app.use(bodyParser.json());
+app.use(cors());
+
+// Connect to MongoDB
+mongoose.connect('mongodb+srv://kalasi:Ti9jsfOe1zPbyZ6m@cluster0.y0rjmkp.mongodb.net/', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => {
+    console.log('Connected to MongoDB');
+}).catch((error) => {
+    console.error('connection error:', error);
 });
 
-mongoose.connect("mongodb+srv://Tharushika:MilkMate2024@milk-mate-web.rd3iyax.mongodb.net/?retryWrites=true&w=majority&appName=Milk-Mate-Web")
-.then(()=>{
-    console.log('Connected to Database');
-})
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
 
-.catch(err =>{
-    console.log("Can't connect to Database")
-})
+// Use order routes
+app.use('/api/orders', orderRoutes);
+
+
+// Start server
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
