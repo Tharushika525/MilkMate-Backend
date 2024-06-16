@@ -24,6 +24,7 @@ const productSchema = new mongoose.Schema({
   brand: String,
   quantity: Number,
   manufacturingDate: Date,
+  sellerName: String,
   approvalStatus: { type: String, enum: ['waiting', 'approved'], default: 'waiting' },
   paymentStatus: { type: String, enum: ['unpaid', 'ongoing'], default: 'unpaid' },
 });

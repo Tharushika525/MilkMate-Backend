@@ -102,10 +102,12 @@ const upload = multer({ storage: storage });
 router.post('/add-product', upload.single('productImage'), async (req, res) => {
   const {
     productName,
+    sellerName,
     purchasePrice,
     brand,
     quantity,
     manufacturingDate,
+   
   } = req.body;
 
   if (!req.file) {
@@ -119,6 +121,7 @@ router.post('/add-product', upload.single('productImage'), async (req, res) => {
     brand,
     quantity,
     manufacturingDate,
+    sellerName,
   });
 
   try {
