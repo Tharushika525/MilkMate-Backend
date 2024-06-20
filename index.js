@@ -13,9 +13,10 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://kalasi:Ti9jsfOe1zPbyZ6m@cluster0.y0rjmkp.mongodb.net/', {
+mongoose.connect('mongodb+srv://Tharushika:MilkMate2024@milk-mate-web.rd3iyax.mongodb.net/?retryWrites=true&w=majority&appName=Milk-Mate-Web', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+  
 }).then(() => {
     console.log('Connected to MongoDB');
 }).catch((error) => {
