@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const orderRoutes = require('./routes/orderRoutes'); // Import order routes
+const productRoute = require('./routes/productRoute'); // Import order routes
+
 
 require('dotenv').config();
 
@@ -28,10 +30,11 @@ db.on('error', console.error.bind(console, 'connection error:'));
 
 // Use order routes
 app.use('/api/orders', orderRoutes);
+app.use('/api/products', productRoute);
 
 
 // Start server
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
