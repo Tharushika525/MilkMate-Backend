@@ -52,10 +52,7 @@ app.listen(PORT, () => {
 
 
 // Chathura
-const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const cors = require('cors');
+
 const bcrypt = require('bcryptjs');
 
 
