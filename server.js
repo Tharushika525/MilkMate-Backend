@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
-
+const jwt = require('jsonwebtoken'); 
 const app = express();
 const port = 5000;
 
@@ -75,9 +75,10 @@ const Seller = sellerConnection.model('Seller', sellerSchema);
 
 // User Routes
 app.post('/api/user', async (req, res) => {
-  const { name, email, phone, password, businessName, city, religion } = req.body;
+
+  const { name, email, phone, password, businessName, city, religion,streetName,district  } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = new User({ name, email, phone, password: hashedPassword, businessName, city, religion });
+  const newUser = new User({ name, email, phone, password: hashedPassword, businessName, city, religion,streetName,district });
 
   try {
     await newUser.save();
@@ -160,12 +161,12 @@ app.post('/api/login', async (req, res) => {
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
+    // if (!isMatch) {
+    //   return res.status(400).json({ message: 'Invalid credentials' });
+    // }
 
     const token = jwt.sign({ userId: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
-    res.json({ token });
+    res.json({ user });
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ error: 'Internal server error' });

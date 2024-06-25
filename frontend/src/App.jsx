@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import RegistrationForm from './RegistrationForm';
-import Profile from './Profile';
+import Profile from './profile';
 import EditForm from './components/EditForm';
 import UserManagement from './UserManagement';
 import SellerManagement from './components/SellerManagement';

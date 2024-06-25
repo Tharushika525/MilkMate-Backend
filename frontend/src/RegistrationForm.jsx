@@ -30,16 +30,19 @@ const RegistrationForm = () => {
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
+    console.log(data);
     try {
+      // Check if email exists
       const emailExists = await axios.post('http://localhost:5000/api/check-email', { email: data.email });
       if (emailExists.data.exists) {
         setError('email', { type: 'manual', message: 'Email is already registered' });
         return;
       }
 
+      // Send complete form data to the backend
       const response = await axios.post('http://localhost:5000/api/user', data);
       console.log('Registration successful:', response.data);
-      navigate('/profile', { state: { user: response.data } });
+      navigate('/profile');
     } catch (error) {
       console.error('Error submitting form:', error);
     }
@@ -119,36 +122,32 @@ const RegistrationForm = () => {
             </Select>
             <FormHelperText>{errors.gender?.message}</FormHelperText>
           </FormControl>
-          // RegistrationForm component
-
-<TextField
-  label="City"
-  {...register('city', { required: 'City is required' })}
-  fullWidth
-  margin="normal"
-  variant="outlined"
-  error={!!errors.city}
-  helperText={errors.city?.message}
-  InputLabelProps={{ style: { color: 'white' } }}
-  InputProps={{
-    style: { color: 'white' },
-  }}
-/>
-
-<TextField
-  label="Street Name"
-  {...register('streetName', { required: 'Street Name is required' })}
-  fullWidth
-  margin="normal"
-  variant="outlined"
-  error={!!errors.streetName}
-  helperText={errors.streetName?.message}
-  InputLabelProps={{ style: { color: 'white' } }}
-  InputProps={{
-    style: { color: 'white' },
-  }}
-/>
-
+          <TextField
+            label="City"
+            {...register('city', { required: 'City is required' })}
+            fullWidth
+            margin="normal"
+            variant="outlined"
+            error={!!errors.city}
+            helperText={errors.city?.message}
+            InputLabelProps={{ style: { color: 'white' } }}
+            InputProps={{
+              style: { color: 'white' },
+            }}
+          />
+          <TextField
+            label="Street Name"
+            {...register('streetName', { required: 'Street Name is required' })}
+            fullWidth
+            margin="normal"
+            variant="outlined"
+            error={!!errors.streetName}
+            helperText={errors.streetName?.message}
+            InputLabelProps={{ style: { color: 'white' } }}
+            InputProps={{
+              style: { color: 'white' },
+            }}
+          />
           <TextField
             label="Remarks (Optional)"
             {...register('remarks')}

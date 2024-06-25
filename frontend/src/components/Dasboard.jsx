@@ -19,18 +19,22 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!userData && user) {
+  
       const fetchUserData = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/api/user/${user.id}`);
+          const id = localStorage.getItem('id');
+          console.log(id);
+          const response = await axios.get(`http://localhost:5000/api/user/${id}`);
           setUserData(response.data);
+
+          console.log(response.data);
         } catch (error) {
           console.error('Error fetching user data:', error);
         }
       };
       fetchUserData();
-    }
-  }, [userData, user]);
+    
+  }, []);
 
   const handleEditAccount = () => {
     navigate('/edit', { state: { user: userData } });
@@ -69,7 +73,7 @@ const Dashboard = () => {
             <CardContent>
               <Typography variant="h6" sx={{ mb: 1 }}>ACCOUNT INFO</Typography>
               <Typography variant="body1">{userData.name}</Typography>
-              <Typography variant="body1">{`${userData.streetName || 'N/A'}, ${userData.city || 'N/A'}, ${userData.district || 'N/A'}`}</Typography>
+              <Typography variant="body1">{`${userData.streetName }, ${userData.city || 'N/A'}, ${userData.district || 'N/A'}`}</Typography>
               <Typography variant="body1">{`Email: ${userData.email}`}</Typography>
               <Typography variant="body1">{`Phone: ${userData.phone}`}</Typography>
               <Button
